@@ -39,80 +39,105 @@ $is_group_3 = ($grupo_id == 3);
     <title>Painel de Controle</title>
     <link rel="stylesheet" href="estilos/estilos.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-        }
+       body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-        .segundo_container {
-            background-color: #ffffff;
-            margin: 10vh;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 3%;
-        }
+.segundo_container {
+    background-color: #ffffff;
+    margin: 10vh 5vw;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 3%;
+    width: 90%;
+    max-width: 1200px;
+}
 
-        .identidade {
-            font-size: 2vw;
-            color: #ff4081;
-            text-align: center;
-        }
+.identidade {
+    font-size: 2vw;
+    color: #ff4081;
+    text-align: center;
+}
 
-        .container_painel {
-            padding: 3%;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2vw;
-            justify-content: center;
-        }
+.container_painel {
+    padding: 3%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2vw;
+    justify-content: center;
+}
 
-        .painel_item {
-            background-color: #ff4081;
-            position: relative;
-            color: #fff;
-            font-size: 1.2vw;
-            height: 13vh; /* Ajusta a altura do item */
-            width: 10vw; /* Ajusta a largura do item */
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden; /* Garante que nada saia da borda da div */
-            text-align: center;
-            flex: 1 1 calc(33.333% - 10px); /* Ajusta o tamanho para três colunas */
-            max-width: calc(33.333% - 10px);
-        }
+.painel_item {
+    background-color: #ff4081;
+    color: #fff;
+    font-size: 1.5vw;
+    height: 13vh;
+    width: 25%;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    text-align: center;
+    flex: 1 1 30%;
+    max-width: 25%;
+}
 
-        .painel_item a {
-            text-decoration: none;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-        }
+.painel_item a {
+    text-decoration: none;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
 
-        .painel_item:hover {
-            background-color: #e91e63;
-        }
+.painel_item:hover {
+    background-color: #e91e63;
+}
 
-        .painel_item.disabled {
-            background-color: #cb9bac;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
+.painel_item.disabled {
+    background-color: #cb9bac;
+    cursor: not-allowed;
+    pointer-events: none;
+}
 
-        .painel_item.disabled a {
-            color: #fff;
-        }
+.painel_item.disabled a {
+    color: #fff;
+}
+
+/* Media queries para responsividade */
+@media screen and (max-width: 768px) {
+    .painel_item {
+        width: 45%;
+        max-width: 45%;
+    }
+
+    .identidade {
+        font-size: 6vw;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .painel_item {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .identidade {
+        font-size: 8vw;
+    }
+}
+
     </style>
 </head>
 <body>
