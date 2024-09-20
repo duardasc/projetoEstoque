@@ -1,16 +1,12 @@
-<?php
-// Gerar hash de senha segura usando bcrypt
-$senhaAdmin = 'Admin123';
-$senhaHash = password_hash($senhaAdmin, PASSWORD_BCRYPT);
-
-echo $senhaHash; // Exibir o hash gerado
-
-echo "</br>CRIA UM USUARIO ADMIN DIRETO NO BANCO NO GRUPO 1 E COLOCA ESSAS LETRA ESTRANHA COMO SENHA E DEPOIS LOGA COMO Admin123"
-?>
 
 <?php
 include 'conexao.php'; // Inclua o arquivo de conexão com o banco de dados
 
+session_start();
+if (!isset($_SESSION['usuario'])) {
+    header('Location: login.php');
+    exit();
+}
 
 
 // Função para verificar a força da senha
@@ -112,6 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <body>
 
+<?php include 'includes/painel_lateral.php'; ?>
 
   <div class="container-cli">
     <h2>Cadastrar Usuário</h2>

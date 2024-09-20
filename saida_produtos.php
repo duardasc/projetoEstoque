@@ -8,22 +8,17 @@ if (!isset($_SESSION['usuario'])) {
 }
 
 $erros = [];
+$usuario_id = $_SESSION['user_id'];
 
-// Obtém o ID do usuário da sessão
-$usuario_id = $_SESSION['user_id'];  // Ajuste conforme o formato da sessão
-
-// Processamento do formulário de saída de produtos
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $destino_id = isset($_POST["destino_id"]) ? $_POST["destino_id"] : null;
-    $produtos = isset($_POST["produto_id"]) ? $_POST["produto_id"] : [];
-    $quantidades = isset($_POST["quantidade"]) ? $_POST["quantidade"] : [];
+    $destino_id = $_POST["destino_id"] ?? null;
+    $produtos = $_POST["produto_id"] ?? [];
+    $quantidades = $_POST["quantidade"] ?? [];
 
     if ($destino_id && !empty($produtos)) {
         try {
-            // Inicia a transação
             $conn->beginTransaction();
 
-            // Verifica se todas as quantidades estão disponíveis
             foreach ($produtos as $index => $produto_id) {
                 $quantidade = $quantidades[$index];
                 $sqlProduto = "SELECT id, codigo, quantidade FROM produtos WHERE id = :produto_id AND ativo = 1";
@@ -42,17 +37,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
 
-            // Se houver erros, não prossegue com a inserção
             if (!empty($erros)) {
                 $_SESSION['erros'] = $erros;
-                header('Location: saida_produtos.php'); // Redireciona para evitar o reenvio do formulário
+                header('Location: saida_produtos.php');
                 exit();
             }
 
-            // Inserir a saída no banco de dados
             $sqlSaida = "INSERT INTO saidas (data_saida, cliente_id, destino_id) VALUES (NOW(), :cliente_id, :destino_id)";
             $stmtSaida = $conn->prepare($sqlSaida);
-            $stmtSaida->bindParam(':cliente_id', $usuario_id); // Define o cliente_id com o ID do usuário da sessão
+            $stmtSaida->bindParam(':cliente_id', $usuario_id);
             $stmtSaida->bindParam(':destino_id', $destino_id);
 
             if (!$stmtSaida->execute()) {
@@ -61,12 +54,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $saida_id = $conn->lastInsertId();
 
-            // Inserir múltiplos produtos na tabela 'itens_saida'
             $sqlItem = "INSERT INTO itens_saida (saida_id, produto_id, quantidade) VALUES (:saida_id, :produto_id, :quantidade)";
             foreach ($produtos as $index => $produto_id) {
                 $quantidade = $quantidades[$index];
 
-                // Inserir o produto no 'itens_saida'
                 $stmtItem = $conn->prepare($sqlItem);
                 $stmtItem->bindParam(':saida_id', $saida_id);
                 $stmtItem->bindParam(':produto_id', $produto_id);
@@ -76,7 +67,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     throw new Exception("Erro ao inserir na tabela 'itens_saida'.");
                 }
 
-                // Atualizar o estoque
                 $sqlUpdate = "UPDATE produtos SET quantidade = quantidade - :quantidade WHERE id = :produto_id";
                 $stmtUpdate = $conn->prepare($sqlUpdate);
                 $stmtUpdate->bindParam(':quantidade', $quantidade);
@@ -87,35 +77,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
 
-            // Confirma a transação se não houver erros
             $conn->commit();
             $_SESSION['success'] = "Saída de produtos registrada com sucesso!";
-            header('Location: saida_produtos.php'); // Redireciona para evitar o reenvio do formulário
+            header('Location: saida_produtos.php');
             exit();
         } catch (Exception $e) {
-            // Reverte a transação em caso de erro
             $conn->rollback();
             $_SESSION['erros'] = ["Erro ao registrar a saída de produtos: " . $e->getMessage()];
-            header('Location: saida_produtos.php'); // Redireciona para evitar o reenvio do formulário
+            header('Location: saida_produtos.php');
             exit();
         }
     } else {
         $_SESSION['erros'] = ["Erro: Por favor, preencha todos os campos obrigatórios."];
-        header('Location: saida_produtos.php'); // Redireciona para evitar o reenvio do formulário
+        header('Location: saida_produtos.php');
         exit();
     }
 }
 
-// Consultas SQL para buscar dados
 $sqlProdutos = "SELECT id, nome, codigo FROM produtos WHERE ativo = 1";
 $stmtProdutos = $conn->query($sqlProdutos);
 $produtos = $stmtProdutos->fetchAll(PDO::FETCH_ASSOC);
 
-$sqlDestino = "SELECT id, nome, cpf_cnpj, inscricao_estadual, cep, estado, cidade, bairro, logradouro, numero, telefone, email FROM destino";
+$sqlDestino = "SELECT id, nome FROM destino"; // Ajuste aqui para trazer apenas os campos necessários
 $stmtDestino = $conn->query($sqlDestino);
 $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <?php include 'includes/painel_lateral.php'; ?>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saída de Produtos</title>
+    <link rel="stylesheet" href="estilos/estilos.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+</head>
+
+<body>
 
 <div class="container-saida">
     <h2>Registrar Saída de Produtos</h2>
@@ -127,215 +129,93 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
         <ul id="destino_lista" class="autocomplete-list-destino"></ul>
 
         <div id="produtos-container">
-          
-            <!-- Primeira linha de produto -->
             <div class="produto-linha">
-                  <!-- Botão de fechar para remover o produto -->
-            <button type="button" class="fechar-produto" style="display: none;"
-                onclick="removerProduto(this)">x</button>
-
+                <button type="button" class="fechar-produto" style="display: none;" onclick="removerProduto(this)">x</button>
                 <div class="produto-nome-container">
                     <label for="produto_pesquisa_1">Produto:</label>
-                    <input type="text" class="produto_pesquisa" placeholder="Digite o código ou nome" autocomplete="off"
-                        required>
+                    <input type="text" class="produto_pesquisa" placeholder="Digite o código ou nome" autocomplete="off" required>
                     <input type="hidden" name="produto_id[]" class="produto_id">
-                    <ul class="autocomplete-list-produto produto_lista"></ul>
                 </div>
                 <div class="produto-quantidade-container">
                     <label for="quantidade_1">Quantidade:</label>
                     <input type="number" name="quantidade[]" class="quantidade" min="1" required>
-                    <div id="error-messages">
-                    </div>
-
-
-
-
+                    <div id="error-messages"></div>
                 </div>
-
             </div>
         </div>
-        <!-- Botão para adicionar produtos -->
+
         <button type="button" class="botao-adicionar-produto" onclick="adicionarProduto()">Adicionar Produto</button>
-
-
         <input type="submit" value="Registrar Saída" class="submit-btn">
-
 
         <?php
         if (isset($_SESSION['erros'])) {
             $erros = $_SESSION['erros'];
-            unset($_SESSION['erros']); // Limpa a variável de sessão após exibição
-            echo '<div class="alert alert-danger">';
-            echo '<ul>';
+            unset($_SESSION['erros']);
+            echo '<div class="alert alert-danger"><ul>';
             foreach ($erros as $erro) {
                 echo '<li>' . $erro . '</li>';
             }
-            echo '</ul>';
-            echo '</div>';
+            echo '</ul></div>';
         }
 
         if (isset($_SESSION['success'])) {
-            echo '<div class="alert alert-success">';
-            echo $_SESSION['success'];
-            echo '</div>';
-            unset($_SESSION['success']); // Limpa a variável de sessão após exibição
+            echo '<div class="alert alert-success">' . $_SESSION['success'] . '</div>';
+            unset($_SESSION['success']);
         }
         ?>
     </form>
-
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    $(document).ready(function() {
         const produtos = <?php echo json_encode($produtos); ?>;
-        const destino = <?php echo json_encode($destino); ?>;
+        const destinos = <?php echo json_encode($destino); ?>;
 
-        // Função para adicionar um novo produto ao formulário
+        // Autocomplete para produtos
+        function setupAutocompleteProduto(inputProduto) {
+            $(inputProduto).autocomplete({
+                source: produtos.map(produto => ({
+                    label: `${produto.nome} - ${produto.codigo}`,
+                    value: produto.nome,
+                    id: produto.id
+                })),
+                select: function(event, ui) {
+                    $(this).siblings('.produto_id').val(ui.item.id);
+                }
+            });
+        }
+
+        // Autocomplete para destinatários
+        $("#destino_pesquisa").autocomplete({
+            source: destinos.map(dest => ({
+                label: dest.nome,
+                value: dest.nome,
+                id: dest.id
+            })),
+            select: function(event, ui) {
+                $("#destino_id").val(ui.item.id);
+            }
+        });
+
+        // Configura o autocomplete para a primeira linha de produtos
+        setupAutocompleteProduto($('.produto_pesquisa')[0]);
+
         window.adicionarProduto = function () {
-            const produtosContainer = document.getElementById('produtos-container');
-            const produtoLinhas = produtosContainer.querySelectorAll('.produto-linha');
+            const novaLinha = $('.produto-linha:first').clone(); // Clona a primeira linha
+            novaLinha.find('input').val(''); // Limpa os campos
+            novaLinha.find('.produto_id').val(''); // Limpa o ID do produto
+            novaLinha.find('.fechar-produto').show(); // Mostra o botão de fechar
+            $('#produtos-container').append(novaLinha); // Adiciona a nova linha ao contêiner
+            setupAutocompleteProduto(novaLinha.find('.produto_pesquisa')); // Configura o autocomplete para a nova linha
+        };
 
-            
-            const novaLinha = document.createElement('div');
-            novaLinha.className = 'produto-linha';
-
-            novaLinha.innerHTML = ` 
-       <button type="button" class="fechar-produto" onclick="removerProduto(this)">x</button>
-        <div class="produto-nome-container">
-            <label for="produto_pesquisa_1">Produto:</label>
-            <input type="text" class="produto_pesquisa" placeholder="Digite o código ou nome" autocomplete="off" required>
-            <input type="hidden" name="produto_id[]" class="produto_id">
-            <ul class="autocomplete-list-produto produto_lista"></ul>
-        </div>
-        <div class="produto-quantidade-container">
-            <label for="quantidade_1">Quantidade:</label>
-            <input type="number" name="quantidade[]" class="quantidade" min="1" required>
-            <div id="error-messages"></div>
-        </div>
-    `;
-
-            produtosContainer.appendChild(novaLinha);
-            adicionarEventosAutocompleteProduto(novaLinha);
-
-            // Exibe o botão de remover em todas as linhas
-            if (produtoLinhas.length >= 1) {
-                document.querySelectorAll('.fechar-produto').forEach(botao => {
-                    botao.style.display = 'inline-block';
-                });
-            }
-        }
-
-        // Função para remover produto
-        window.removerProduto = function (button) {
-            const linhaProduto = button.closest('.produto-linha');
-            linhaProduto.remove();
-
-            // Se houver apenas um produto restante, esconde os botões de remover
-            const produtoLinhas = document.querySelectorAll('.produto-linha');
-            if (produtoLinhas.length === 1) {
-                document.querySelectorAll('.fechar-produto').forEach(botao => {
-                    botao.style.display = 'none';
-                });
-            }
-        }
-
-        // Função de autocomplete para produtos
-        function adicionarEventosAutocompleteProduto(linha) {
-            const inputProduto = linha.querySelector('.produto_pesquisa');
-            const listaProduto = linha.querySelector('.produto_lista');
-
-            inputProduto.addEventListener('input', () => {
-                listaProduto.innerHTML = '';
-                const valor = inputProduto.value.toLowerCase();
-                if (valor === '') {
-                    listaProduto.style.display = 'none';
-                    return;
-                }
-                listaProduto.style.display = 'block';
-
-                // Filtra os produtos baseados na letra inicial ou código
-                const produtosFiltrados = produtos.filter(produto =>
-                    produto.nome.toLowerCase().startsWith(valor) ||
-                    produto.codigo.toLowerCase().startsWith(valor)
-                );
-
-                produtosFiltrados.forEach(produto => {
-                    const item = document.createElement('li');
-                    item.textContent = `${produto.nome} - ${produto.codigo}`;
-                    item.addEventListener('click', () => {
-                        inputProduto.value = produto.nome;
-                        linha.querySelector('.produto_id').value = produto.id;
-                        listaProduto.innerHTML = '';
-                        listaProduto.style.display = 'none';
-                    });
-                    listaProduto.appendChild(item);
-                });
-            });
-
-            // Esconde a lista ao clicar fora do input
-            document.addEventListener('click', (event) => {
-                if (!inputProduto.contains(event.target) && !listaProduto.contains(event.target)) {
-                    listaProduto.style.display = 'none';
-                }
-            });
-
-            // Esconde a lista ao sair do campo de input
-            inputProduto.addEventListener('blur', () => {
-                setTimeout(() => {
-                    listaProduto.style.display = 'none';
-                }, 100);  // Timeout para permitir o clique nos itens da lista
-            });
-        }
-
-        // Adiciona eventos de autocomplete ao input de destinatário
-        const inputDestino = document.getElementById('destino_pesquisa');
-        const listaDestino = document.getElementById('destino_lista');
-
-        inputDestino.addEventListener('input', () => {
-            listaDestino.innerHTML = '';
-            const valor = inputDestino.value.toLowerCase();
-            if (valor === '') {
-                listaDestino.style.display = 'none';
-                return;
-            }
-            listaDestino.style.display = 'block';
-            const destinosFiltrados = destino.filter(dest =>
-                dest.nome.toLowerCase().startsWith(valor)
-            );
-            destinosFiltrados.forEach(dest => {
-                const item = document.createElement('li');
-                item.textContent = `${dest.nome}`;
-                item.addEventListener('click', () => {
-                    inputDestino.value = dest.nome;
-                    document.getElementById('destino_id').value = dest.id;
-                    listaDestino.innerHTML = '';
-                    listaDestino.style.display = 'none';
-                });
-                listaDestino.appendChild(item);
-            });
-        });
-
-        // Esconde a lista de destinatário ao clicar fora
-        document.addEventListener('click', (event) => {
-            if (!inputDestino.contains(event.target) && !listaDestino.contains(event.target)) {
-                listaDestino.style.display = 'none';
-            }
-        });
-
-        // Esconde a lista ao sair do campo de input
-        inputDestino.addEventListener('blur', () => {
-            setTimeout(() => {
-                listaDestino.style.display = 'none';
-            }, 100);  // Timeout para permitir o clique nos itens da lista
-        });
-
-        // Inicializa o autocomplete para a primeira linha de produtos
-        adicionarEventosAutocompleteProduto(document.querySelector('.produto-linha'));
+        window.removerProduto = function (botao) {
+            $(botao).closest('.produto-linha').remove(); // Remove a linha do produto
+        };
     });
-
-
 </script>
-
+</body>
+</html>
 
 <style>
     /* styles.css */
@@ -352,8 +232,8 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
     .container-saida {
         width: 45%;
         max-width: 70%;
-        margin: 20px auto;
-        padding: 20px;
+        margin: 4% auto;
+        padding: 2.5%;
         background: #fff;
         border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -438,9 +318,10 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
     flex-direction: row;
     margin-bottom: 10px;
     input {
-            width: 18vw;
+            width: 19vw;
         }
 }
+
 
 .fechar-produto {
     position: absolute; 
@@ -508,7 +389,7 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
     }
 
     .autocomplete-list-destino li:hover {
-        background-color: #f5f5f5;
+        background-color: pink;
     }
 
     .autocomplete-list-produto li:hover {
@@ -548,3 +429,7 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
         }
     }
 </style>
+
+
+</body>
+</html>

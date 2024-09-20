@@ -27,9 +27,6 @@ if (!$result) {
 
 $grupo_id = $result['grupo_id'];
 
-// Verificação de depuração: Mostrar grupo_id do usuário
-echo "Grupo ID do usuário logado: " . $grupo_id . "<br>";
-
 // Consulta para verificar se o grupo do usuário tem permissão para "gerenciar" o recurso 'usuarios'
 $sql = "SELECT pgr.grupo_id, p.nome AS permissao_nome, r.nome AS recurso_nome 
         FROM permissoes_por_grupo_e_recurso pgr
@@ -41,12 +38,6 @@ $stmt->bindParam(':grupo_id', $grupo_id);
 $stmt->execute();
 $permissao = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Verificação de depuração: Mostrar o resultado da consulta de permissões
-if ($permissao) {
-    echo "Permissão encontrada: Grupo ID - " . $permissao['grupo_id'] . ", Permissão - " . $permissao['permissao_nome'] . ", Recurso - " . $permissao['recurso_nome'] . "<br>";
-} else {
-    echo "Nenhuma permissão encontrada para o grupo " . $grupo_id . " com 'gerenciar' em 'usuarios'.<br>";
-}
 
 if (!$permissao) {
     // Se o grupo do usuário não tem permissão para gerenciar o recurso, redireciona ou exibe uma mensagem de erro
@@ -91,6 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
+<?php include 'includes/painel_lateral.php'; ?>
 
 <div class="container-fornecedor">
   <div class="titulo-fornecedor"><h2>Cadastrar Fornecedor</h2></div>
@@ -109,7 +101,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <input type="email" id="email" name="email" required>
 
     <label for="cnpj">CNPJ:</label>
-    <input type="text" id="cnpj" name="cnpj" required>
+            <input type="text" id="cnpj" name="cnpj" required maxlength="14" pattern="^\d{14}$"
+                title="O CNPJ deve conter exatamente 14 dígitos." oninput="validarCNPJ(this)">
+
+            <script>
+                function validarCNPJ(input) {
+                    // Remove caracteres não numéricos
+                    input.value = input.value.replace(/\D/g, '');
+
+                    // Limita a entrada a 6 dígitos
+                    if (input.value.length > 14) {
+                        input.value = input.value.slice(0, 14);
+                    }
+                }
+            </script>
 
     <input type="submit" value="Cadastrar" class="submit-btn">
   </form> 

@@ -10,21 +10,30 @@ if (!isset($_SESSION['usuario'])) {
 // Inicialize uma variável para exibir mensagens
 $message = "";
 
-// Processamento do formulário de cadastro
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Obter dados do formulário
-    $nome = $_POST["nome"];
-    $codigo = $_POST["codigo"];
-    $marca = $_POST["marca"];
-    $preco = $_POST["preco"];
-    $quantidade = $_POST["quantidade"];
-    $tamanho = $_POST["tamanho"];
-    $cor = $_POST["cor"];
-    $minimo = $_POST["minimo"];
-    $fornecedor_id = $_POST["fornecedor_id"];
-    $categoria = $_POST["categoria"];
+// Obter o ID do usuário da sessão
+if (isset($_SESSION['user_id'])) {
+    $usuario_id = $_SESSION['user_id'];
+} else {
+    $message = "<p class='error-messagen'>Erro: Usuário não encontrado na sessão.</p>";
+}
 
-    // Verificação básica para evitar envio de formulário com valores inválidos ou incompletos
+// Obter a data e hora local
+$data_hora = date('Y-m-d H:i:s');
+
+// Verificação básica para evitar envio de formulário com valores inválidos ou incompletos
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Obter os valores do formulário
+    $codigo = $_POST['codigo'];
+    $nome = $_POST['nome'];
+    $marca = $_POST['marca'];
+    $preco = $_POST['preco'];
+    $quantidade = $_POST['quantidade'];
+    $tamanho = $_POST['tamanho'];
+    $cor = $_POST['cor'];
+    $fornecedor_id = $_POST['fornecedor_id'];
+    $categoria = $_POST['categoria'];
+    $minimo = $_POST['minimo'];
+
     if (empty($codigo) || $codigo == "0" || empty($nome) || empty($preco) || empty($quantidade) || empty($tamanho) || empty($cor) || empty($minimo) || empty($fornecedor_id) || empty($categoria)) {
         $message = "<p class='error-messagen'>Erro: Todos os campos obrigatórios devem ser preenchidos corretamente e o código do produto deve ser válido.</p>";
     } else {
@@ -39,8 +48,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $message = "<p class='error-messagen'>Erro: O código de produto já existe. Por favor, use outro código.</p>";
         } else {
             // Preparar e executar a consulta SQL para inserir o novo produto
-            $sql = "INSERT INTO produtos (nome, codigo, marca, preco, quantidade, tamanho, cor, fornecedor_id, categoria, minimo) 
-                    VALUES (:nome, :codigo, :marca, :preco, :quantidade, :tamanho, :cor, :fornecedor_id, :categoria, :minimo)";
+            $sql = "INSERT INTO produtos (nome, codigo, marca, preco, quantidade, tamanho, cor, fornecedor_id, categoria, minimo, cliente_id, data_hora) 
+                    VALUES (:nome, :codigo, :marca, :preco, :quantidade, :tamanho, :cor, :fornecedor_id, :categoria, :minimo, :cliente_id, NOW())";
+
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':nome', $nome);
             $stmt->bindParam(':codigo', $codigo);
@@ -52,6 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(':fornecedor_id', $fornecedor_id);
             $stmt->bindParam(':categoria', $categoria);
             $stmt->bindParam(':minimo', $minimo);
+            $stmt->bindParam(':cliente_id', $usuario_id);
 
             try {
                 $stmt->execute();
@@ -78,7 +89,6 @@ $stmtFornecedores = $conn->query($sqlFornecedores);
 $fornecedores = $stmtFornecedores->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -87,9 +97,13 @@ $fornecedores = $stmtFornecedores->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Produto</title>
     <link rel="stylesheet" href="estilos/estilos.css">
+    <style>
+        /* Estilos para a página */
+    </style>
 </head>
 
 <body>
+    <?php include 'includes/painel_lateral.php'; ?>
 
     <div class="container-prod">
         <div class="titulo-prod">
@@ -105,8 +119,18 @@ $fornecedores = $stmtFornecedores->fetchAll(PDO::FETCH_ASSOC);
             <label for="nome">Nome:</label>
             <input type="text" id="nome" name="nome" required>
 
-            <label for="codigo">Código:</label>
-            <input type="number" id="codigo" name="codigo" maxlength="6" required>
+            <label for="codigo">Código (6 dígitos):</label>
+            <input type="text" id="codigo" name="codigo" required maxlength="6" pattern="^\d{6}$"
+                title="O código deve conter exatamente 6 dígitos." oninput="validarCodigo(this)">
+
+            <script>
+                function validarCodigo(input) {
+                    input.value = input.value.replace(/\D/g, '');
+                    if (input.value.length > 6) {
+                        input.value = input.value.slice(0, 6);
+                    }
+                }
+            </script>
 
             <label for="marca">Marca:</label>
             <input type="text" id="marca" name="marca">
@@ -127,8 +151,7 @@ $fornecedores = $stmtFornecedores->fetchAll(PDO::FETCH_ASSOC);
             <input type="text" id="cor" name="cor" required>
 
             <label for="fornecedor_pesquisa">Fornecedor:</label>
-            <input type="text" id="fornecedor_pesquisa" placeholder="Digite o nome do fornecedor" autocomplete="off"
-                required>
+            <input type="text" id="fornecedor_pesquisa" placeholder="Digite o nome do fornecedor" autocomplete="off" required>
             <input type="hidden" id="fornecedor_id" name="fornecedor_id" required>
             <div id="fornecedor_container">
                 <ul id="fornecedor_lista" class="autocomplete-list"></ul>
@@ -146,7 +169,8 @@ $fornecedores = $stmtFornecedores->fetchAll(PDO::FETCH_ASSOC);
             <input type="submit" value="Cadastrar" class="submit-btn">
         </form>
     </div>
-    <script> 
+
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
             const fornecedores = <?php echo json_encode($fornecedores); ?>;
             const fornecedorPesquisa = document.getElementById('fornecedor_pesquisa');
@@ -174,21 +198,21 @@ $fornecedores = $stmtFornecedores->fetchAll(PDO::FETCH_ASSOC);
                         const li = document.createElement('li');
                         li.textContent = item.nome;
                         li.addEventListener('click', function () {
+                           
                             fornecedorPesquisa.value = item.nome;
                             fornecedorIdInput.value = item.id;
-                            listaElement.innerHTML = ''; // Limpa a lista após a seleção
-                            fornecedorLista.style.display = 'none'; // Esconde a lista após a seleção
+                            fornecedorLista.innerHTML = ''; // Limpa a lista ao selecionar
+                            fornecedorLista.style.display = 'none'; // Esconde a lista
                         });
                         listaElement.appendChild(li);
                     });
                 }
             }
 
-            // Fechar lista ao clicar fora
             document.addEventListener('click', function (event) {
-                if (!event.target.matches('#fornecedor_pesquisa') && !event.target.closest('#fornecedor_lista')) {
+                if (event.target !== fornecedorPesquisa) {
                     fornecedorLista.innerHTML = '';
-                    fornecedorLista.style.display = 'none';
+                    fornecedorLista.style.display = 'none'; // Esconde a lista ao clicar fora
                 }
             });
         });
