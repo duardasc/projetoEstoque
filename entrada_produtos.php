@@ -11,48 +11,62 @@ if (!isset($_SESSION['usuario'])) {
 $usuario_id = $_SESSION['user_id'];
 
 // Inicializa variáveis de mensagem
+// Inicializa variáveis de mensagem
 $mensagem = '';
+$mensagem_erro = '';
 
 // Processamento do formulário de entrada de produtos
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Obter dados do formulário
     $produto_id = $_POST["produto_id"];
     $quantidade = $_POST["quantidade"];
-    $data_entrada = date('Y-m-d'); // Pega a data atual
-    $cliente_id = $usuario_id; // Usar o ID do usuário da sessão como cliente_id
+    $data_entrada = date('Y-m-d');
+    $cliente_id = $usuario_id;
 
-    try {
-        // Iniciar transação
-        $conn->beginTransaction();
+    // Verificar se o produto existe
+    $sqlVerificaProduto = "SELECT id FROM produtos WHERE id = :produto_id";
+    $stmtVerificaProduto = $conn->prepare($sqlVerificaProduto);
+    $stmtVerificaProduto->bindParam(':produto_id', $produto_id);
+    $stmtVerificaProduto->execute();
 
-        // Inserir registro na tabela de entradas
-        $sqlEntrada = "INSERT INTO entradas (produto_id, quantidade, data_entrada, cliente_id) VALUES (:produto_id, :quantidade, NOW(), :cliente_id)";
-        $stmtEntrada = $conn->prepare($sqlEntrada);
-        $stmtEntrada->bindParam(':produto_id', $produto_id);
-        $stmtEntrada->bindParam(':quantidade', $quantidade);
-        $stmtEntrada->bindParam(':cliente_id', $cliente_id); // Usa o ID do usuário da sessão
-        $stmtEntrada->execute();
-
-        // Atualizar a quantidade em estoque do produto
-        $sqlUpdate = "UPDATE produtos SET quantidade = quantidade + :quantidade WHERE id = :produto_id";
-        $stmtUpdate = $conn->prepare($sqlUpdate);
-        $stmtUpdate->bindParam(':quantidade', $quantidade);
-        $stmtUpdate->bindParam(':produto_id', $produto_id);
-        $stmtUpdate->execute();
-
-        // Commit da transação
-        $conn->commit();
-
-        // Mensagem de sucesso
-        $_SESSION['mensagem'] = "Entrada de produtos registrada com sucesso!";
-        header('Location: ' . $_SERVER['PHP_SELF']); // Redireciona para a mesma página
+    if ($stmtVerificaProduto->rowCount() == 0) {
+        $_SESSION['mensagem_erro'] = "Erro: O produto digitado não existe.";
+        header('Location: ' . $_SERVER['PHP_SELF']);
         exit();
-    } catch (PDOException $e) {
-        // Rollback da transação em caso de erro
-        $conn->rollback();
-        $_SESSION['mensagem'] = "Erro ao registrar a entrada de produtos: " . $e->getMessage();
-        header('Location: ' . $_SERVER['PHP_SELF']); // Redireciona para a mesma página
-        exit();
+    } else {
+        try {
+            // Iniciar transação
+            $conn->beginTransaction();
+
+            // Inserir registro na tabela de entradas
+            $sqlEntrada = "INSERT INTO entradas (produto_id, quantidade, data_entrada, cliente_id) VALUES (:produto_id, :quantidade, NOW(), :cliente_id)";
+            $stmtEntrada = $conn->prepare($sqlEntrada);
+            $stmtEntrada->bindParam(':produto_id', $produto_id);
+            $stmtEntrada->bindParam(':quantidade', $quantidade);
+            $stmtEntrada->bindParam(':cliente_id', $cliente_id);
+            $stmtEntrada->execute();
+
+            // Atualizar a quantidade em estoque do produto
+            $sqlUpdate = "UPDATE produtos SET quantidade = quantidade + :quantidade WHERE id = :produto_id";
+            $stmtUpdate = $conn->prepare($sqlUpdate);
+            $stmtUpdate->bindParam(':quantidade', $quantidade);
+            $stmtUpdate->bindParam(':produto_id', $produto_id);
+            $stmtUpdate->execute();
+
+            // Commit da transação
+            $conn->commit();
+
+            // Mensagem de sucesso
+            $_SESSION['mensagem'] = "Entrada de produtos registrada com sucesso!";
+            header('Location: ' . $_SERVER['PHP_SELF']);
+            exit();
+        } catch (PDOException $e) {
+            // Rollback da transação em caso de erro
+            $conn->rollback();
+            $_SESSION['mensagem'] = "Erro ao registrar a entrada de produtos: " . $e->getMessage();
+            header('Location: ' . $_SERVER['PHP_SELF']);
+            exit();
+        }
     }
 }
 
@@ -78,6 +92,11 @@ if (isset($_GET['term'])) {
 }
 
 // Verifica se há mensagem na sessão
+if (isset($_SESSION['mensagem_erro'])) {
+    $mensagem_erro = $_SESSION['mensagem_erro'];
+    unset($_SESSION['mensagem_erro']); // Limpa a mensagem após exibir
+}
+
 if (isset($_SESSION['mensagem'])) {
     $mensagem = $_SESSION['mensagem'];
     unset($_SESSION['mensagem']); // Limpa a mensagem após exibir
@@ -104,6 +123,7 @@ $clientes = $stmtClientes->fetchAll(PDO::FETCH_ASSOC);
             background-color: #f8f9fa; /* Cor de fundo leve */
             font-family: Arial, sans-serif; /* Fonte padrão */
             color: #333; /* Cor do texto */
+            background-color: #f5f5f5;
         }
         
         .container-entrada {
@@ -118,19 +138,30 @@ $clientes = $stmtClientes->fetchAll(PDO::FETCH_ASSOC);
 
         h2 {
             color: #d63384; /* Cor do título */
+            text-align: center;
         }
 
         .success-message {
-            background-color: #d4edda; /* Fundo da mensagem de sucesso */
-            color: #155724; /* Cor do texto da mensagem */
+            background-color: #d4edda; 
+            color: #155724; 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin-bottom: 15px; 
+            text-align: center;
+        }
+
+        .error-message {
+            background-color: #f8d7da; /* Fundo da mensagem de erro */
+            color: #721c24; /* Cor do texto da mensagem de erro */
             padding: 10px; /* Espaçamento interno */
             border-radius: 5px; /* Bordas arredondadas */
             margin-bottom: 15px; /* Margem inferior */
+            text-align: center;
         }
 
         .product-form label {
             font-weight: bold;
-        font-size: 0.75rem;
+        font-size: 0.9rem;
         color: #555;
         font-weight: 700;
         position: relative;
@@ -182,11 +213,15 @@ $clientes = $stmtClientes->fetchAll(PDO::FETCH_ASSOC);
 <?php include 'includes/painel_lateral.php'; ?>
 
 <div class="container-entrada">
-    <h2>Registrar Entrada de Produtos</h2>
-
-    <?php if ($mensagem): ?>
+<?php if ($mensagem): ?>
         <p class="success-message"><?php echo $mensagem; ?></p>
     <?php endif; ?>
+    <?php if ($mensagem_erro): ?>
+        <p class="error-message"><?php echo $mensagem_erro; ?></p>
+    <?php endif; ?>
+    <h2>Registrar Entrada de Produtos</h2>
+
+   
 
     <form method="post" class="product-form">
         <label for="produto_id">Produto:</label>

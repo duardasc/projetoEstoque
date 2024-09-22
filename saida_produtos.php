@@ -103,7 +103,7 @@ $stmtDestino = $conn->query($sqlDestino);
 $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<?php include 'includes/painel_lateral.php'; ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -118,8 +118,26 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
 </head>
 
 <body>
-
+<?php include 'includes/painel_lateral.php'; ?>
 <div class="container-saida">
+    <div class="mensagens">
+<?php
+        if (isset($_SESSION['erros'])) {
+            $erros = $_SESSION['erros'];
+            unset($_SESSION['erros']);
+            echo '<div class="alert alert-danger">';
+            foreach ($erros as $erro) {
+                echo  $erro ;
+            }
+            
+        }
+
+        if (isset($_SESSION['success'])) {
+            echo '<div class="alert alert-success">' . $_SESSION['success'] . '</div>';
+            unset($_SESSION['success']);
+        }
+        ?>
+        </div>
     <h2>Registrar Saída de Produtos</h2>
 
     <form method="post" class="product-form">
@@ -147,22 +165,7 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
         <button type="button" class="botao-adicionar-produto" onclick="adicionarProduto()">Adicionar Produto</button>
         <input type="submit" value="Registrar Saída" class="submit-btn">
 
-        <?php
-        if (isset($_SESSION['erros'])) {
-            $erros = $_SESSION['erros'];
-            unset($_SESSION['erros']);
-            echo '<div class="alert alert-danger"><ul>';
-            foreach ($erros as $erro) {
-                echo '<li>' . $erro . '</li>';
-            }
-            echo '</ul></div>';
-        }
-
-        if (isset($_SESSION['success'])) {
-            echo '<div class="alert alert-success">' . $_SESSION['success'] . '</div>';
-            unset($_SESSION['success']);
-        }
-        ?>
+       
     </form>
 </div>
 
@@ -206,7 +209,7 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
             novaLinha.find('.produto_id').val(''); // Limpa o ID do produto
             novaLinha.find('.fechar-produto').show(); // Mostra o botão de fechar
             $('#produtos-container').append(novaLinha); // Adiciona a nova linha ao contêiner
-            setupAutocompleteProduto(novaLinha.find('.produto_pesquisa')); // Configura o autocomplete para a nova linha
+            setupAutocompleteProduto(novaLinha.find('.produto_pesquisa'));
         };
 
         window.removerProduto = function (botao) {
@@ -236,12 +239,14 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
         padding: 2.5%;
         background: #fff;
         border-radius: 8px;
+        height: auto;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
     h2 {
         color: #e91e63;
         margin-bottom: 5vh;
+        text-align: center;
     }
 
     /* Estilização do formulário */
@@ -251,8 +256,7 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
     }
 
     label {
-        font-weight: bold;
-        font-size: 0.75rem;
+        font-size: 0.9rem;
         color: #555;
         font-weight: 700;
         position: relative;
@@ -291,7 +295,7 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
         border-radius: 4px;
         cursor: pointer;
         font-size: 16px;
-        margin-top:5vh;
+        margin-top:1.5rem;
     }
 
     .submit-btn:hover {
@@ -353,67 +357,43 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
 
     /* Estilização das listas de autocomplete */
     .autocomplete-list-destino,
-    .autocomplete-list-produto {
-        position: absolute;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background: #fff;
-        max-height: 200px;
-        overflow-y: auto;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        z-index: 1000;
-    }
+.autocomplete-list-produto {
+    position: absolute;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    max-height: 200px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    z-index: 1000;
+    display: block; /* Força a lista a aparecer */
+}
 
-    .autocomplete-list-destino {
-        margin-top: 8vh;
-    }
+   
 
+   .alert {
+    padding: 0.5%;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    text-align: center;
+    height: 5vh; /* ou um valor fixo, como 30px */
+    min-height: 30px; /* Adiciona uma altura mínima */
+    display: flex; /* Para centralizar texto verticalmente */
+    align-items: center; /* Centraliza verticalmente */
+    justify-content: center; /* Centraliza horizontalmente */
+}
 
-    .autocomplete-list-produto {
-        margin-top: -1.8vh;
-    }
-
-
-
-
-    .autocomplete-list-destino li {
-        padding: 10px;
-        cursor: pointer;
-    }
-
-    .autocomplete-list-produto li {
-        padding: 10px;
-        cursor: pointer;
-    }
-
-    .autocomplete-list-destino li:hover {
-        background-color: pink;
-    }
-
-    .autocomplete-list-produto li:hover {
-        background-color: #f5f5f5;
-    }
-
-
-    /* Estilização dos erros e mensagens de sucesso */
-    .alert {
-        padding: 10px;
-        border-radius: 4px;
-        margin-bottom: 20px;
-    }
 
     .alert-danger {
         background-color: #f8d7da;
         color: #721c24;
-        border: 1px solid #f5c6cb;
     }
 
     .alert-success {
         background-color: #d4edda;
         color: #155724;
-        border: 1px solid #c3e6cb;
     }
 
     /* Responsividade */
