@@ -39,6 +39,8 @@ $stmtCompras->execute();
 $resultCompras = $stmtCompras->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
+
+
 <?php if ($mostrarCompras): ?>
     <div class="hdois"><h3>Relatório de Compras</h3></div>
     <div class="select-container">
@@ -224,16 +226,4 @@ $resultCompras = $stmtCompras->fetchAll(PDO::FETCH_ASSOC);
     </script>
 <?php endif; ?>
 
-<style>
-    .chart-container {
-        width: 100%;
-        max-height: 500px; /* Altura máxima definida para o gráfico */
-        position: relative;
-        overflow: hidden; /* Garante que o gráfico não transborde */
-    }
 
-    #comprasPrecoChart {
-        width: 100% !important;
-        height: 100% !important;
-    }
-</style>

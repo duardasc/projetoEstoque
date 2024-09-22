@@ -201,6 +201,31 @@ if (isset($_POST['editar'])) {
   }
 }
 
+// Defina o número de resultados por página
+$resultsPerPage = 10;
+
+// Obtenha o número total de produtos
+$sqlCount = "SELECT COUNT(*) FROM produtos WHERE ativo = TRUE";
+$totalResults = $conn->query($sqlCount)->fetchColumn();
+$totalPages = ceil($totalResults / $resultsPerPage);
+
+// Calcule a página atual
+$currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$currentPage = max(1, min($totalPages, $currentPage));
+
+// Calcule o deslocamento
+$offset = ($currentPage - 1) * $resultsPerPage;
+
+// Modifique a consulta SQL para incluir LIMIT e OFFSET
+$sqlEstoque .= " LIMIT :limit OFFSET :offset";
+$stmtEstoque = $conn->prepare($sqlEstoque);
+if ($searchTermOriginal) {
+  $stmtEstoque->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
+}
+$stmtEstoque->bindParam(':limit', $resultsPerPage, PDO::PARAM_INT);
+$stmtEstoque->bindParam(':offset', $offset, PDO::PARAM_INT);
+$stmtEstoque->execute();
+$resultEstoque = $stmtEstoque->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -209,7 +234,7 @@ if (isset($_POST['editar'])) {
 
 <head>
   <title>Relatórios</title>
-  <link rel="stylesheet" href="estilos/relatorios.css">
+  <link rel="stylesheet" href="estilos/relatorio.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
 </head>
@@ -222,15 +247,15 @@ if (isset($_POST['editar'])) {
     <div class="hdois"><h2>Relatórios</h2></div>
 
     <div class="botoes-mostra">
-      <a href="?mostrar=estoque"><button>Ver Estoque</button></a>
-      <a href="?mostrar=vendas"><button>Ver Vendas</button></a>
-      <a href="?mostrar=compras"><button>Ver Compras</button></a>
-      <a href="?mostrar=alteracoes"><button>Ver alteracoes</button></a>
+      <a href="?mostrar=estoque"><button>Estoque</button></a>
+      <a href="?mostrar=vendas"><button>Vendas</button></a>
+      <a href="?mostrar=compras"><button>Compras</button></a>
+      <a href="?mostrar=alteracoes"><button>Alterações</button></a>
     </div>
 
     <!-- Seção de Estoque -->
     <?php if ($mostrarEstoque): ?>
-      <div class="hdois"><h3>Informações do Estoque</h3></div>
+     
 
       <div class="chart-info-container">
   <div class="chart-container-pizza">
@@ -253,7 +278,7 @@ if (isset($_POST['editar'])) {
   </div>
 </div>
 
-
+<div class="hdois"><h3>Informações do Estoque</h3></div>
 <div class="search-container">
   <form method="GET" action="" id="pesquisa">
     <input type="hidden" name="mostrar" value="estoque">
@@ -267,7 +292,8 @@ if (isset($_POST['editar'])) {
       <?php if (empty($resultEstoque)): ?>
         <p class="error-message">Nenhum produto encontrado para "<?php echo htmlspecialchars($searchTerm); ?>".</p>
       <?php else: ?>
-        <table>
+        <div>
+        <table class="tabela">
           <thead>
             <tr>
               <th>Código</th>
@@ -315,6 +341,7 @@ if (isset($_POST['editar'])) {
             <?php endforeach; ?>
           </tbody>
         </table>
+        </div>
       <?php endif; ?>
     </div>
 
@@ -373,6 +400,21 @@ if (isset($_POST['editar'])) {
       </form>
     </div>
   </div>
+
+  <div class="pagination">
+  <?php if ($currentPage > 1): ?>
+    <a href="?mostrar=estoque&page=<?php echo $currentPage - 1; ?>">« Anterior</a>
+  <?php endif; ?>
+
+  <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+    <a href="?mostrar=estoque&page=<?php echo $i; ?>" <?php if ($i == $currentPage) echo 'class="active"'; ?>><?php echo $i; ?></a>
+  <?php endfor; ?>
+
+  <?php if ($currentPage < $totalPages): ?>
+    <a href="?mostrar=estoque&page=<?php echo $currentPage + 1; ?>">Próxima »</a>
+  <?php endif; ?>
+</div>
+
 
   <!-- Script para abrir/fechar o modal -->
   <script>

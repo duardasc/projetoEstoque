@@ -128,12 +128,13 @@ $clientes = $stmtClientes->fetchAll(PDO::FETCH_ASSOC);
         
         .container-entrada {
             width: 45%;
-            max-width: 70%;
-            margin: 4% auto; /* Centraliza a caixa */
-            padding: 2.5%; /* Espaçamento interno */
-            background-color: #ffffff; /* Fundo branco */
-            border-radius: 8px; /* Bordas arredondadas */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra */
+        max-width: 70%;
+        margin: 4% auto;
+        padding: 2.5%;
+        background: #fff;
+        border-radius: 8px;
+        height: auto;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         h2 {

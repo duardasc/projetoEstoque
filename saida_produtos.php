@@ -10,6 +10,30 @@ if (!isset($_SESSION['usuario'])) {
 $erros = [];
 $usuario_id = $_SESSION['user_id'];
 
+// Tratamento da pesquisa AJAX para produtos
+if (isset($_GET['query'])) {
+    $query = $_GET['query'];
+    $sql = "SELECT id, nome, codigo FROM produtos WHERE ativo = 1 AND (nome LIKE :query OR codigo LIKE :query)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindValue(':query', $query . '%');
+    $stmt->execute();
+    $produtos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode($produtos);
+    exit();
+}
+
+// Tratamento da pesquisa AJAX para destinatários
+if (isset($_GET['destino_query'])) {
+    $query = $_GET['destino_query'];
+    $sql = "SELECT id, nome FROM destino WHERE nome LIKE :query";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindValue(':query', $query . '%');
+    $stmt->execute();
+    $destinos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode($destinos);
+    exit();
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $destino_id = $_POST["destino_id"] ?? null;
     $produtos = $_POST["produto_id"] ?? [];
@@ -93,17 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 }
-
-$sqlProdutos = "SELECT id, nome, codigo FROM produtos WHERE ativo = 1";
-$stmtProdutos = $conn->query($sqlProdutos);
-$produtos = $stmtProdutos->fetchAll(PDO::FETCH_ASSOC);
-
-$sqlDestino = "SELECT id, nome FROM destino"; // Ajuste aqui para trazer apenas os campos necessários
-$stmtDestino = $conn->query($sqlDestino);
-$destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -121,15 +135,15 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
 <?php include 'includes/painel_lateral.php'; ?>
 <div class="container-saida">
     <div class="mensagens">
-<?php
+        <?php
         if (isset($_SESSION['erros'])) {
             $erros = $_SESSION['erros'];
             unset($_SESSION['erros']);
             echo '<div class="alert alert-danger">';
             foreach ($erros as $erro) {
-                echo  $erro ;
+                echo $erro;
             }
-            
+            echo '</div>'; // Fecha a div de alert
         }
 
         if (isset($_SESSION['success'])) {
@@ -137,7 +151,7 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
             unset($_SESSION['success']);
         }
         ?>
-        </div>
+    </div>
     <h2>Registrar Saída de Produtos</h2>
 
     <form method="post" class="product-form">
@@ -164,59 +178,84 @@ $destino = $stmtDestino->fetchAll(PDO::FETCH_ASSOC);
 
         <button type="button" class="botao-adicionar-produto" onclick="adicionarProduto()">Adicionar Produto</button>
         <input type="submit" value="Registrar Saída" class="submit-btn">
-
-       
     </form>
 </div>
 
 <script>
-    $(document).ready(function() {
-        const produtos = <?php echo json_encode($produtos); ?>;
-        const destinos = <?php echo json_encode($destino); ?>;
+$(document).ready(function() {
+    // Autocomplete para destinatários com pesquisa AJAX
+    $("#destino_pesquisa").on('keyup', function() {
+        const query = $(this).val();
 
-        // Autocomplete para produtos
-        function setupAutocompleteProduto(inputProduto) {
-            $(inputProduto).autocomplete({
-                source: produtos.map(produto => ({
-                    label: `${produto.nome} - ${produto.codigo}`,
-                    value: produto.nome,
-                    id: produto.id
-                })),
-                select: function(event, ui) {
-                    $(this).siblings('.produto_id').val(ui.item.id);
-                }
-            });
-        }
+        $.ajax({
+            url: '', // URL do mesmo arquivo
+            data: { destino_query: query },
+            dataType: 'json',
+            success: function(data) {
+                const listaDestinos = data.map(dest => ({
+                    label: dest.nome,
+                    value: dest.nome,
+                    id: dest.id
+                }));
 
-        // Autocomplete para destinatários
-        $("#destino_pesquisa").autocomplete({
-            source: destinos.map(dest => ({
-                label: dest.nome,
-                value: dest.nome,
-                id: dest.id
-            })),
-            select: function(event, ui) {
-                $("#destino_id").val(ui.item.id);
+                $("#destino_pesquisa").autocomplete({
+                    source: listaDestinos,
+                    minLength: 1,
+                    select: function(event, ui) {
+                        $("#destino_id").val(ui.item.id);
+                    }
+                });
             }
         });
-
-        // Configura o autocomplete para a primeira linha de produtos
-        setupAutocompleteProduto($('.produto_pesquisa')[0]);
-
-        window.adicionarProduto = function () {
-            const novaLinha = $('.produto-linha:first').clone(); // Clona a primeira linha
-            novaLinha.find('input').val(''); // Limpa os campos
-            novaLinha.find('.produto_id').val(''); // Limpa o ID do produto
-            novaLinha.find('.fechar-produto').show(); // Mostra o botão de fechar
-            $('#produtos-container').append(novaLinha); // Adiciona a nova linha ao contêiner
-            setupAutocompleteProduto(novaLinha.find('.produto_pesquisa'));
-        };
-
-        window.removerProduto = function (botao) {
-            $(botao).closest('.produto-linha').remove(); // Remove a linha do produto
-        };
     });
+
+    // Função para adicionar novos produtos
+    window.adicionarProduto = function() {
+        const novaLinha = $('.produto-linha:first').clone();
+        novaLinha.find('input').val('');
+        novaLinha.find('.produto_id').val('');
+        novaLinha.find('.fechar-produto').show();
+        $('#produtos-container').append(novaLinha);
+        inicializarAutocompleteProduto(novaLinha.find('.produto_pesquisa'));
+    };
+
+    // Função para inicializar autocomplete para produtos
+    function inicializarAutocompleteProduto(input) {
+        input.on('keyup', function() {
+            const query = $(this).val();
+
+            $.ajax({
+                url: '', // URL do mesmo arquivo
+                data: { query: query },
+                dataType: 'json',
+                success: function(data) {
+                    input.autocomplete({
+                        source: data.map(produto => ({
+                            label: `${produto.nome} - ${produto.codigo}`,
+                            value: produto.nome,
+                            id: produto.id
+                        })),
+                        minLength: 1,
+                        select: function(event, ui) {
+                            input.next('.produto_id').val(ui.item.id);
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    // Inicializa autocomplete para o primeiro produto
+    inicializarAutocompleteProduto($('.produto_pesquisa:first'));
+
+});
+
+// Função para remover um produto
+function removerProduto(button) {
+    $(button).closest('.produto-linha').remove();
+}
 </script>
+
 </body>
 </html>
 
