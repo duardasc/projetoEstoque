@@ -61,7 +61,7 @@ $is_group_3 = ($grupo_id == 3);
 
 .identidade {
     font-size: 2vw;
-    color: #ff4081;
+    color: #dd5684;
     text-align: center;
 }
 
@@ -74,7 +74,7 @@ $is_group_3 = ($grupo_id == 3);
 }
 
 .painel_item {
-    background-color: #ff4081;
+    background-color: #dd5684;
     color: #fff;
     font-size: 1.5vw;
     height: 13vh;
@@ -102,7 +102,7 @@ $is_group_3 = ($grupo_id == 3);
 }
 
 .painel_item:hover {
-    background-color: #e91e63;
+    background-color: #c3446f;
 }
 
 .painel_item.disabled {

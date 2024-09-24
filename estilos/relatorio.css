@@ -19,19 +19,23 @@ body {
 .container {
   max-width: 1200px;
   padding: 20px;
+  background-color: white;
+}
+
+p{
+  margin-top: 3%;
 }
 
 /* Títulos */
 .hdois h2, .hdois h3 {
-  color: #ff66b2; /* Cor rosa para destacar títulos */
-  margin-top: 3rem;
+  color: #dd5684; /* Cor rosa para destacar títulos */
+  margin: 3rem;
   text-align: center; /* Centraliza os títulos */
   font-size: 1.6rem;
 }
 
 /* Botões de navegação */
 .botoes-mostra {
-  margin-bottom: 20px;
   text-align: center; /* Centraliza os botões */
 }
 
@@ -39,37 +43,40 @@ body {
   text-decoration: none;
 }
 
+
 .botoes-mostra button {
-  background-color: #ff66b2; /* Cor rosa para botões */
+  background-color: #dd5684; /* Cor rosa para botões */
   color: #fff;
   border: none;
   border-radius: 4px;
-  padding: 10px 20px;
+  padding: 1rem 2rem;
   cursor: pointer;
   font-size: 1.3rem;
-  width: 13vw;
-  gap: 5%;
+  width: 10vw;
   transition: background-color 0.3s;
   margin: 1%;
-  margin-top: 3%;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
 .botoes-mostra button:hover {
-  background-color: #e55a9b;
+  background-color: #c3446f;
+}
+
+.tabela{
+  width: 100%;
 }
 
 /* Tabela de resultados */
-table {
-  width: 80%; /* Define uma largura fixa para a tabela */
+table { width: 10%; /* Define uma largura fixa para a tabela */
   margin: 3rem auto; /* Centraliza a tabela horizontalmente */
   border-collapse: collapse;
   background-color: #fff;   text-align: center;
+  table-layout: fixed;
 
 }
 
 table thead {
-  background-color: #ff66b2;
+  background-color: #dd5684;
   color: #fff;
 }
 
@@ -77,6 +84,13 @@ table th, table td {
   padding: 12px;
   border-bottom: 1px solid #ddd;
 }
+
+table th {
+  width: 6rem; /* ou qualquer valor fixo que você achar adequado */
+}
+
+
+
 
 table tr:nth-child(even) {
   background-color: #f9f9f9;
@@ -93,10 +107,10 @@ table tr:nth-child(even) {
 .info-box {
   background-color: #fff;
   padding: 4%;
-  width: 20vw;
+  width: 16vw;
   margin-bottom: 1.3rem;
   border-radius: 5px;
-  border: 0.2vw solid #ff66b2; /* Adiciona borda rosa */
+  border: 0.1vw solid #dd5684; /* Adiciona borda rosa */
   text-align: center;
   height: auto; /* Ajuste a altura para auto */
 }
@@ -104,7 +118,7 @@ table tr:nth-child(even) {
 .info-box-title {
   font-size: 18px;
   margin-bottom: 10px;
-  color: #ff66b2;
+  color: #dd5684;
   font-weight: bold;
 }
 
@@ -112,16 +126,19 @@ table tr:nth-child(even) {
 .chart-info-container {
   display: flex;
   align-items: center;
-  gap: 20px;
   padding: 5%;
-  background: #fff;
+  background: #fbfbfb;
   height: 16rem;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 60%;
-  margin: 0 auto; /* Centraliza o container do gráfico */
-  justify-content: space-between;
+  box-shadow: 0 0 10px rgb(0 0 0 / 13%);
+  width: 70%;
+  margin: 0 auto;
+  justify-content: space-around;
+  
+  margin-top: 3rem;
 }
+
+
 
 /* Estilo para inputs e botões de pesquisa */
 .search-container {
@@ -135,26 +152,26 @@ table tr:nth-child(even) {
 }
 
 .search-container input[type="text"] {
-  padding: 10px;
+  padding: 1%;
   font-size: 16px;
   border: 1px solid #ddd;
   border-radius: 4px;
   margin-right: 10px;
-  width: 50vw;
+  width: 42vw;
 }
 
 .search-container input[type="submit"] {
-  background-color: #ff66b2;
+  background-color: #dd5684;
   color: #fff;
   border: none;
-  padding: 10px 20px;
+  padding: 1% 2%;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
 }
 
 .search-container input[type="submit"]:hover {
-  background-color: #e55a9b;
+  background-color: #c3446f;
 }
 
 #botaoeditar, #botaoexcluir{
@@ -173,7 +190,7 @@ table tr:nth-child(even) {
 }
 
 #botaoexcluir {
-  background-color: #df619c;
+  background-color: #dd5684;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -182,12 +199,13 @@ table tr:nth-child(even) {
 }
 
 #botaoeditar:hover{
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 #botaoexcluir:hover{
-  transform: scale(1.1);  
+  transform: scale(1.05);  
 }
+
 
 /* Estilo para modais */
 .modal {
@@ -201,6 +219,30 @@ table tr:nth-child(even) {
   overflow: auto;
   background-color: rgba(0,0,0,0.4);
   padding-top: 60px;
+
+  h2{
+    margin: 1%;
+  }
+
+  input[type="submit"]{
+    background-color: #dd5684;
+  color: #fff;
+  border: none;
+  padding: 1% 2%;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+
+  }
+  input[type="submit"]:hover{
+
+    background-color: #c3446f;
+  }
+  
+}
+
+#deleteModal{
+  padding-top: 10%;
 }
 
 .modal-content {
@@ -215,7 +257,7 @@ table tr:nth-child(even) {
 }
 
 .close, .close-btn {
-  color: #aaa;
+  color: #dd5684;
   float: right;
   font-size: 28px;
   font-weight: bold;
@@ -238,21 +280,26 @@ table tr:nth-child(even) {
   border-radius: 4px;
 }
 
-.modal-content button {
-  background-color: #ff66b2;
+
+textarea {
+  resize: none;
+}
+
+.modal-content {
+  button{
+    background-color: #dd5684;
   color: #fff;
   border: none;
-  padding: 10px 20px;
+  padding: 1% 2%;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  margin-top: 10px;
-}
+  }
 
-.modal-content button:hover {
-  background-color: #e55a9b;
-}
-
+  button:hover{
+    background-color: #c3446f;
+  }
+ }
 /* Lista de autocomplete */
 .autocomplete-list {
   border: 1px solid #ddd;
@@ -277,24 +324,21 @@ table tr:nth-child(even) {
   background-color: #f4f4f4;
 }
 
-
 .pagination {
-  display: flex;
-  justify-content: center;
   margin-top: 20px;
+  text-align: center;
 }
 
 .pagination a {
+  padding: 5px 10px;
   margin: 0 5px;
   text-decoration: none;
-  color: #007BFF;
+  border: 1px solid #ddd;
+  color: #000;
 }
 
 .pagination a.active {
-  font-weight: bold;
-  text-decoration: underline;
-}
-
-.pagination a:hover {
-  text-decoration: underline;
+  background-color: #dd5684; /* Cor de fundo rosa */
+  color: white; /* Cor do texto */
+ 
 }

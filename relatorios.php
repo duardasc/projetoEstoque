@@ -260,6 +260,7 @@ $resultEstoque = $stmtEstoque->fetchAll(PDO::FETCH_ASSOC);
       <div class="chart-info-container">
   <div class="chart-container-pizza">
     <canvas id="pizzaChart"></canvas>
+    <p><i>Estoque baseado nas categorias de produtos</i></p>
   </div>
 
   <div class="box-info-box">
@@ -292,8 +293,8 @@ $resultEstoque = $stmtEstoque->fetchAll(PDO::FETCH_ASSOC);
       <?php if (empty($resultEstoque)): ?>
         <p class="error-message">Nenhum produto encontrado para "<?php echo htmlspecialchars($searchTerm); ?>".</p>
       <?php else: ?>
-        <div>
-        <table class="tabela">
+        <div class="tabela">
+        <table >
           <thead>
             <tr>
               <th>Código</th>
@@ -322,7 +323,7 @@ $resultEstoque = $stmtEstoque->fetchAll(PDO::FETCH_ASSOC);
                 <td><?php echo htmlspecialchars($row['nome_fornecedor']); ?></td>
                 <td>
                 <form method="POST" action="">
-
+                
                 <input type="hidden" name="produto_id" value="<?php echo htmlspecialchars($row['id']); ?>">
                 <button type="button" id="botaoeditar" onclick="openEditModal(
     <?php echo htmlspecialchars($row['id']); ?>,
@@ -342,6 +343,20 @@ $resultEstoque = $stmtEstoque->fetchAll(PDO::FETCH_ASSOC);
           </tbody>
         </table>
         </div>
+  <div class="pagination">
+  <?php if ($currentPage > 1): ?>
+    <a href="?mostrar=estoque&page=<?php echo $currentPage - 1; ?>">« Anterior</a>
+  <?php endif; ?>
+
+  <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+    <a href="?mostrar=estoque&page=<?php echo $i; ?>" <?php if ($i == $currentPage) echo 'class="active"'; ?>><?php echo $i; ?></a>
+  <?php endfor; ?>
+
+  <?php if ($currentPage < $totalPages): ?>
+    <a href="?mostrar=estoque&page=<?php echo $currentPage + 1; ?>">Próxima »</a>
+  <?php endif; ?>
+</div>
+       
       <?php endif; ?>
     </div>
 
@@ -351,7 +366,7 @@ $resultEstoque = $stmtEstoque->fetchAll(PDO::FETCH_ASSOC);
    <div id="deleteModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeDeleteModal()">&times;</span>
-        <p>Por favor, informe o motivo da exclusão:</p>
+        <p>Por favor, informe o motivo da exclusão do produto:</p>
         <form id="deleteForm" method="post" action="">
             <input type="hidden" id="productId" name="produto_id">
             <div>
@@ -391,7 +406,7 @@ $resultEstoque = $stmtEstoque->fetchAll(PDO::FETCH_ASSOC);
 <ul id="fornecedor_lista" class="autocomplete-list"></ul>
 
 <label for="editPreco">Preço:</label>
-    <input type="number" name="preco" id="editPreco" required>
+    <input type="number" name="preco" step="0.01" id="editPreco" required>
 
         <label for="editMotivo">Motivo da Alteração:</label>
         <textarea name="motivo" id="editMotivo" required></textarea>
@@ -401,19 +416,6 @@ $resultEstoque = $stmtEstoque->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </div>
 
-  <div class="pagination">
-  <?php if ($currentPage > 1): ?>
-    <a href="?mostrar=estoque&page=<?php echo $currentPage - 1; ?>">« Anterior</a>
-  <?php endif; ?>
-
-  <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-    <a href="?mostrar=estoque&page=<?php echo $i; ?>" <?php if ($i == $currentPage) echo 'class="active"'; ?>><?php echo $i; ?></a>
-  <?php endfor; ?>
-
-  <?php if ($currentPage < $totalPages): ?>
-    <a href="?mostrar=estoque&page=<?php echo $currentPage + 1; ?>">Próxima »</a>
-  <?php endif; ?>
-</div>
 
 
   <!-- Script para abrir/fechar o modal -->

@@ -4,6 +4,7 @@ include 'conexao.php'; // Inclua o arquivo de conexão com o banco de dados
 
 session_start();
 
+
 if (isset($_SESSION['usuario'])) {
     header('Location: painel.php');
     exit();
@@ -50,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="caixa_principal">
         <div class="container_login">
             <div class="form_area">
-                <p class="title">LOGIN</p>
+                <p class="title">LOGIN </p>
                 <form action="login.php" method="post">
                     <div class="form_group">
                         <label class="sub_title" for="email">Email</label>

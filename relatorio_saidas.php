@@ -88,12 +88,15 @@ $resultVendas = $stmtVendas->fetchAll(PDO::FETCH_ASSOC);
 
 // Seção de Vendas
 if ($mostrarVendas): ?>
-    <div class="hdois"><h3>Relatório de Vendas</h3></div>
 
 
-    <div class="select-container">
+    
+    <div class="chart-container">
+        <div class="chart-vendas"><div class="select-container">
         <form method="GET" action="">
             <input type="hidden" name="mostrar" value="vendas">
+            <div><h4>Quantidade de Vendas e Preço Total por Mês</h4></div>
+
             <select name="ano" onchange="this.form.submit()">
                 <option value="">Selecione o ano</option>
                 <?php
@@ -105,10 +108,12 @@ if ($mostrarVendas): ?>
             </select>
         </form>
     </div>
-    <div class="chart-container">
-        <div class="hdois"><h4>Quantidade de Vendas e Preço Total por Mês</h4></div>
         <canvas id="vendasPrecoChart"></canvas>
+        </div>
     </div>
+
+    
+    <div class="hdois"><h3>Relatório de Vendas</h3></div>
     <div class="search-container">
         <form method="GET" action="">
             <input type="hidden" name="mostrar" value="vendas">
@@ -123,14 +128,14 @@ if ($mostrarVendas): ?>
 <div class="filter-date-container">
     <form method="GET" action="">
         <input type="hidden" name="mostrar" value="vendas">
-        
+       
         <label for="data_inicio">Data Início:</label>
         <input type="date" name="data_inicio" value="<?php echo isset($_GET['data_inicio']) ? htmlspecialchars($_GET['data_inicio']) : ''; ?>">
-        
+            </br>
         <label for="data_fim">Data Fim:</label>
         <input type="date" name="data_fim" value="<?php echo isset($_GET['data_fim']) ? htmlspecialchars($_GET['data_fim']) : ''; ?>">
-        
-        <input type="submit" value="Filtrar">
+       
+        <button type="button"  value="Filtrar">Filtrar</button>
         <button type="button" onclick="limparFiltro()">Limpar Filtro</button>
     </form>
 </div>
@@ -277,3 +282,96 @@ function fecharModal() {
 
     </script>
 <?php endif; ?>
+
+
+<style>
+    .chart-vendas{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4%;
+  background: #fbfbfb;
+  height: 20rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgb(0 0 0 / 13%);
+  width: 40%;
+  margin: 0 auto;
+  justify-content: space-around;
+  margin-top: 3rem;
+  align-items: center;
+  justify-content: center;
+
+  h4{
+    margin-bottom: 6%;
+  }
+}
+
+select {
+    padding: 1%; /* Espaçamento interno */
+    border: 1px solid #ccc; /* Borda */
+    border-radius: 5px; /* Bordas arredondadas */
+    width: 10rem;
+    margin-bottom: 2rem;
+    background-color: #fff; /* Cor de fundo */
+    font-size: 1rem; /* Tamanho da fonte */
+    color: #333; /* Cor do texto */
+    cursor: pointer; /* Muda o cursor ao passar sobre o select */
+    transition: border-color 0.3s; /* Transição suave na cor da borda */
+}
+
+
+select option {
+    padding: 10px; 
+}
+
+.filter-date-container{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    padding: 4%;
+    background: #fbfbfb;
+    /* height: 2rem; */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgb(0 0 0 / 13%);
+    width: 55%;
+    margin: 0 auto;
+    margin-top: 3rem;
+
+    input[type="date"]{
+         padding: 1%; 
+    border: 1px solid #ccc; 
+    border-radius: 5px;
+    width: 10rem;
+    margin-bottom: 2rem;
+    background-color: #fff; 
+    font-size: 1rem; 
+    color: #333;
+    cursor: pointer; 
+    transition: border-color 0.3s;
+    }
+
+  button {
+  background-color: #dd5684;
+  color: #fff;
+  border: none;
+  padding: 1% 2%;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 2%;
+}
+
+button:hover {
+  background-color: #c3446f;
+}
+
+form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+}
+
+
+</style>

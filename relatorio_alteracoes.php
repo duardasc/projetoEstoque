@@ -108,22 +108,5 @@ try {
 </body>
 </html>
 <style>
-        .pagination {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .pagination a {
-            padding: 5px 10px;
-            margin: 0 5px;
-            text-decoration: none;
-            border: 1px solid #ddd;
-            color: #000;
-        }
-
-        .pagination a.active {
-            background-color: #ff69b4; /* Cor de fundo rosa */
-            color: white; /* Cor do texto */
-            border: 1px solid #ff69b4; /* Borda rosa */
-        }
+      
     </style>
