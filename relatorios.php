@@ -468,7 +468,7 @@ function openEditModal(produtoId, nome, minimo, categoria, marca, preco, fornece
           datasets: [{
             label: 'Quantidade em Estoque por Categoria',
             data: <?php echo json_encode($quantidades); ?>,
-            backgroundColor: ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink'],
+            backgroundColor: ['#df4d4d', '#5662dd', '#efc841', '#ae56dd', '#dd56b5', '#56dd65', '#dd8656'],
           }]
         },
         options: {

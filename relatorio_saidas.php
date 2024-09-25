@@ -112,34 +112,35 @@ if ($mostrarVendas): ?>
         </div>
     </div>
 
-    
-    <div class="hdois"><h3>Relatório de Vendas</h3></div>
-    <div class="search-container">
-        <form method="GET" action="">
-            <input type="hidden" name="mostrar" value="vendas">
-            <input type="text" name="search" placeholder="Pesquisar por destinatário" value="<?php echo htmlspecialchars($searchTerm); ?>">
-            <input type="submit" value="Buscar">
-        </form>
-    </div>
+    <div class="hdois"><h3>Informações das Saídas</h3></div>
 
+    <div class="search-container" style="position: relative;">
+    <button id="btnFiltro" onclick="toggleFiltro()" >
+        <i class="fas fa-filter" id="toggleIcon"></i> Filtro
+    </button>
 
-        <!-- Formulário de Filtro de Data -->
-<!-- Formulário de Filtro de Data -->
-<div class="filter-date-container">
-    <form method="GET" action="">
+    <form method="GET" action="" >
         <input type="hidden" name="mostrar" value="vendas">
-       
-        <label for="data_inicio">Data Início:</label>
-        <input type="date" name="data_inicio" value="<?php echo isset($_GET['data_inicio']) ? htmlspecialchars($_GET['data_inicio']) : ''; ?>">
-            </br>
-        <label for="data_fim">Data Fim:</label>
-        <input type="date" name="data_fim" value="<?php echo isset($_GET['data_fim']) ? htmlspecialchars($_GET['data_fim']) : ''; ?>">
-       
-        <button type="button"  value="Filtrar">Filtrar</button>
-        <button type="button" onclick="limparFiltro()">Limpar Filtro</button>
+        <input type="text" name="search" placeholder="Pesquisar por destinatário" value="<?php echo htmlspecialchars($searchTerm); ?>">
+        <input type="submit" value="Pesquisar">
     </form>
 </div>
 
+<!-- Formulário de Filtro de Data -->
+<div id="filter-date-container" >
+    <form method="GET" action="">
+        <input type="hidden" name="mostrar" value="vendas">
+
+        <label for="data_inicio">Data Início:</label>
+        <input type="date" name="data_inicio" value="<?php echo isset($_GET['data_inicio']) ? htmlspecialchars($_GET['data_inicio']) : ''; ?>">
+        <br>
+        <label for="data_fim">Data Fim:</label>
+        <input type="date" name="data_fim" value="<?php echo isset($_GET['data_fim']) ? htmlspecialchars($_GET['data_fim']) : ''; ?>">
+        <br>
+        <button type="submit" value="Filtrar">Filtrar</button>
+        <button type="button" onclick="limparFiltro()">Limpar Filtro</button>
+    </form>
+</div>
 <script>
     function limparFiltro() {
         // Redireciona para a página sem parâmetros de data e de pesquisa
@@ -147,10 +148,9 @@ if ($mostrarVendas): ?>
     }
 </script>
 
-    <table border="1">
+    <table class="tabelaVendas" border="1">
         <thead>
             <tr>
-                <th>ID da Venda</th>
                 <th>Data da Venda</th>
                 <th>Total da Venda (R$)</th>
                 <th>Destinatário</th>
@@ -161,7 +161,6 @@ if ($mostrarVendas): ?>
         <tbody>
             <?php foreach ($resultVendas as $row): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($row['venda_id']); ?></td>
                     <td><?php echo htmlspecialchars($row['data_venda']); ?></td>
                     <td>R$ <?php echo number_format($row['preco_total'], 2, ',', '.'); ?></td>
                     <td><?php echo htmlspecialchars($row['destino_nome']); ?></td>
@@ -280,11 +279,66 @@ function fecharModal() {
     document.getElementById('modalDetalhes').style.display = 'none';
 }
 
+
+function toggleFiltro() {
+        var filtroContainer = document.getElementById("filter-date-container");
+        filtroContainer.style.display = filtroContainer.style.display === "none" || filtroContainer.style.display === "" ? "block" : "none";
+    }
+
+    function limparFiltro() {
+        // Redireciona para a página sem parâmetros de data e de pesquisa
+        window.location.href = '?mostrar=vendas';
+    }
+
+
     </script>
 <?php endif; ?>
 
 
 <style>
+
+#btnFiltro {
+    background-color: #dd5684; /* Cor rosa */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#btnFiltro:hover {
+    background-color: #c3446f; /* Cor rosa escura */
+}
+
+#filter-date-container {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+        display: none; /* Inicialmente escondido */
+        position: absolute;  
+        text-align: center;
+        justify-self: center;
+        background-color: white; 
+        padding: 0.6%; 
+        line-height: 2.3rem;
+        border: 1px solid #ccc;
+        z-index: 100; /* Garante que fique acima de outros elementos */
+        left: 24.5rem;
+
+        button{
+            background-color: #dd5684; /* Cor rosa */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 2%;
+        }
+
+        button:hover {
+    background-color: #c3446f; /* Cor rosa escura */
+}
+    }
+
     .chart-vendas{
   display: flex;
   flex-direction: column;
@@ -324,54 +378,44 @@ select option {
     padding: 10px; 
 }
 
-.filter-date-container{
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    padding: 4%;
-    background: #fbfbfb;
-    /* height: 2rem; */
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgb(0 0 0 / 13%);
-    width: 55%;
-    margin: 0 auto;
+.search-container{
     margin-top: 3rem;
-
-    input[type="date"]{
-         padding: 1%; 
-    border: 1px solid #ccc; 
-    border-radius: 5px;
-    width: 10rem;
-    margin-bottom: 2rem;
-    background-color: #fff; 
-    font-size: 1rem; 
-    color: #333;
-    cursor: pointer; 
-    transition: border-color 0.3s;
-    }
-
-  button {
-  background-color: #dd5684;
-  color: #fff;
-  border: none;
-  padding: 1% 2%;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  margin: 2%;
-}
-
-button:hover {
-  background-color: #c3446f;
-}
-
-form{
+    text-align: center;
     display: flex;
-    flex-direction: column;
     justify-content: center;
+    gap: 2%;
+    
+
+    input[type="text"]{
+        width: 40rem;
+        padding: 2%;
+    }
+}
+
+.tabelaVendas{
+    th {
+    width: 10rem;
+}
+border: none;
+
+    table-layout: fixed;
+    button{
+            background-color: #dd5684; /* Cor rosa */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 2%;
+        }
+
+        button:hover {
+    background-color: #c3446f; /* Cor rosa escura */
 }
 }
 
-
+#modalDetalhes{
+    padding-top: 10rem;  
+  
+}
 </style>

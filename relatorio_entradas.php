@@ -226,4 +226,8 @@ $resultCompras = $stmtCompras->fetchAll(PDO::FETCH_ASSOC);
     </script>
 <?php endif; ?>
 
+<style>
+    
+</style>
+
 

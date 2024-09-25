@@ -71,7 +71,7 @@ table { width: 10%; /* Define uma largura fixa para a tabela */
   margin: 3rem auto; /* Centraliza a tabela horizontalmente */
   border-collapse: collapse;
   background-color: #fff;   text-align: center;
-  table-layout: fixed;
+ 
 
 }
 
