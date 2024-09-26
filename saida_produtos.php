@@ -307,23 +307,6 @@ function removerProduto(button) {
         
     }
 
-    input[type="text"],
-    input[type="number"] {
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        display: flex;
-        flex-direction: column;
-        position: static;
-        margin-bottom: 4%;
-    }
-
-    input[type="text"]:focus,
-    input[type="number"]:focus {
-        border-color: #e91e63;
-        outline: none;
-    }
-
     
 
     .submit-btn {

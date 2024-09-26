@@ -221,6 +221,8 @@ $is_group_3 = ($grupo_id == 3);
     <a href="entrada_produtos.php" class="<?php echo $is_group_3 ? 'disabled' : ''; ?>"><i class="fas fa-sign-in-alt"></i> Registrar Entrada de Produtos</a>
     <a href="saida_produtos.php" class="<?php echo $is_group_3 ? 'disabled' : ''; ?>"><i class="fas fa-sign-out-alt"></i> Registrar Saída de Produtos</a>
     <a href="relatorios.php" class="<?php echo $is_group_3 ? 'disabled' : ''; ?>"><i class="fas fa-chart-line"></i> Gerar Relatórios</a>
+    <a href="estoque.php" ><i class="fas fa-table"></i> Estoque</a>
+
     <a href="logout.php" class="logout-btn"><i class="fas fa-door-open"></i>Sair</a>
 </div>
 

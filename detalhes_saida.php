@@ -25,7 +25,7 @@ if ($saida_id > 0) {
         echo "<p><strong>Usuário:</strong> " . htmlspecialchars($resultado[0]['nome_cliente']) . "</p>";
         echo "<p><strong>Destinatário:</strong> " . htmlspecialchars($resultado[0]['nome_destino']) . "</p>";
 
-        echo "<table border='1'>";
+        echo "<table";
         echo "<thead><tr><th>Código do Produto</th><th>Nome do Produto</th><th>Quantidade</th><th>Preço Unitário</th><th>Preço Total</th></tr></thead>";
         echo "<tbody>";
         foreach ($resultado as $item) {

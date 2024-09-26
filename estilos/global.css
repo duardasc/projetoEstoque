@@ -1,0 +1,326 @@
+* {
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Estilo para o corpo da página */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex; /* Adiciona flexbox */
+    justify-content: center; /* Centraliza horizontalmente */
+    height: 100vh; /* Usa toda a altura da tela */
+    margin: 0; /* Remove a margem padrão */
+  }
+  
+  /* Container geral */
+  .container {
+    width: 55rem;;
+    padding: 20px;
+    background-color: white;
+  }
+  
+ 
+  /* Títulos */
+  .hdois h2, .hdois h3 {
+    color: #dd5684; /* Cor rosa para destacar títulos */
+    margin: 3rem;
+    text-align: center; /* Centraliza os títulos */
+    font-size: 1.6rem;
+  }
+
+table{
+    table-layout: fixed;
+    button{
+            background-color: #dd5684; /* Cor rosa */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 2%;
+        }
+
+        button:hover {
+    background-color: #c3446f; /* Cor rosa escura */
+}
+}
+
+.tabela{
+    width: 100%;
+  }
+  
+  /* Tabela de resultados */
+  table { 
+    margin: 3rem auto; /* Centraliza a tabela horizontalmente */
+    border-collapse: collapse;  text-align: center;
+   
+  
+  }
+  
+  table thead {
+    background-color: #dd5684;
+    color: #fff;
+  }
+  
+  table th, table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    width: 4.5rem;
+  }
+  
+ 
+  
+  
+  
+  table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  /* Containers de gráfico */
+.chart-info-container {
+    display: flex;
+    align-items: center;
+    padding: 5%;
+    background: #fbfbfb;
+    height: 16rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgb(0 0 0 / 13%);
+    width: 70%;
+    margin: 0 auto;
+    justify-content: space-around;
+    
+    margin-top: 3rem;
+  }
+  
+  
+  
+  /* Estilo para inputs e botões de pesquisa */
+  .search-container {
+    margin-top: 3rem;
+    text-align: center; /* Centraliza a barra de pesquisa */
+  }
+  
+  .search-container form {
+    display: flex;
+    justify-content: center; /* Centraliza o formulário */
+  }
+  
+  .search-container input[type="text"] {
+    padding: 1%;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-right: 10px;
+    width: 42vw;
+  }
+  
+  .search-container input[type="submit"] {
+    background-color: #dd5684;
+    color: #fff;
+    border: none;
+    padding: 1% 2%;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .search-container input[type="submit"]:hover {
+    background-color: #c3446f;
+  }
+
+  
+/* Estilo para modais */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+    padding-top: 60px;
+  
+    h2{
+      margin: 1%;
+    }
+  
+    input[type="submit"]{
+      background-color: #dd5684;
+    color: #fff;
+    border: none;
+    padding: 1% 2%;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  
+    }
+    input[type="submit"]:hover{
+  
+      background-color: #c3446f;
+    }
+    
+  }
+  
+  #deleteModal{
+    padding-top: 10%;
+  }
+  
+  .modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .close, .close-btn {
+    color: #dd5684;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover, .close-btn:hover {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  /* Estilo para inputs e botões no modal */
+  .modal-content input[type="text"],
+  .modal-content input[type="number"],
+  .modal-content textarea {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  
+  textarea {
+    resize: none;
+  }
+  
+  .modal-content {
+    button{
+      background-color: #dd5684;
+    color: #fff;
+    border: none;
+    padding: 1% 2%;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    }
+  
+    button:hover{
+      background-color: #c3446f;
+    }
+   }
+  /* Lista de autocomplete */
+  .autocomplete-list {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    max-height: 150px;
+    overflow-y: auto;
+    position: absolute;
+    background-color: #fff;
+    width: 100%;
+    z-index: 1000;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .autocomplete-list li {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .autocomplete-list li:hover {
+    background-color: #f4f4f4;
+  }
+  
+  .pagination {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .pagination a {
+    padding: 5px 10px;
+    margin: 0 5px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    color: #000;
+  }
+  
+  .pagination a.active {
+    background-color: #dd5684; /* Cor de fundo rosa */
+    color: white; /* Cor do texto */
+   
+  }
+
+  
+  select {
+    padding: 1%; /* Espaçamento interno */
+    border: 1px solid #ccc; /* Borda */
+    border-radius: 5px; /* Bordas arredondadas */
+    width: 10rem;
+    margin-bottom: 2rem;
+    background-color: #fff; /* Cor de fundo */
+    font-size: 1rem; /* Tamanho da fonte */
+    color: #333; /* Cor do texto */
+    cursor: pointer; /* Muda o cursor ao passar sobre o select */
+    transition: border-color 0.3s; /* Transição suave na cor da borda */
+}
+
+
+select option {
+    padding: 10px; 
+}
+
+.search-container{
+    margin-top: 3rem;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 2%;
+    
+
+    input[type="text"]{
+        width: 40rem;
+        padding: 2%;
+    }
+}
+
+
+
+#modalDetalhes{
+    padding-top: 10rem;  
+  
+}
+
+
+input[type="text"],
+input[type="number"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    position: static;
+    margin-bottom: 4%;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: #e91e63;
+    outline: none;
+}

@@ -85,6 +85,27 @@ if (isset($_GET['data_fim']) && !empty($_GET['data_fim'])) {
 $stmtVendas->execute();
 $resultVendas = $stmtVendas->fetchAll(PDO::FETCH_ASSOC);
 
+// Consulta para os produtos mais vendidos
+$sqlProdutosMaisVendidos = "SELECT p.nome AS produto_nome, SUM(i.quantidade) AS total_vendido
+                            FROM itens_saida i
+                            JOIN produtos p ON i.produto_id = p.id
+                            GROUP BY p.nome
+                            ORDER BY total_vendido DESC
+                            LIMIT 5"; // Limitar a 5 produtos mais vendidos
+
+$stmtProdutosMaisVendidos = $conn->prepare($sqlProdutosMaisVendidos);
+$stmtProdutosMaisVendidos->execute();
+$resultProdutosMaisVendidos = $stmtProdutosMaisVendidos->fetchAll(PDO::FETCH_ASSOC);
+
+$produtos = [];
+$quantidadesVendidas = [];
+
+foreach ($resultProdutosMaisVendidos as $row) {
+    $produtos[] = $row['produto_nome'];
+    $quantidadesVendidas[] = $row['total_vendido'];
+}
+
+
 
 // Seção de Vendas
 if ($mostrarVendas): ?>
@@ -111,6 +132,9 @@ if ($mostrarVendas): ?>
         <canvas id="vendasPrecoChart"></canvas>
         </div>
     </div>
+
+    <h4>Produtos Mais Vendidos</h4>
+    <canvas id="produtosMaisVendidosChart"></canvas>
 
     <div class="hdois"><h3>Informações das Saídas</h3></div>
 
@@ -148,7 +172,7 @@ if ($mostrarVendas): ?>
     }
 </script>
 
-    <table class="tabelaVendas" border="1">
+    <table >
         <thead>
             <tr>
                 <th>Data da Venda</th>
@@ -291,6 +315,34 @@ function toggleFiltro() {
     }
 
 
+    const ctxProdutos = document.getElementById('produtosMaisVendidosChart').getContext('2d');
+new Chart(ctxProdutos, {
+    type: 'bar',
+    data: {
+        labels: <?php echo json_encode($produtos); ?>,
+        datasets: [{
+            label: 'Quantidade Vendida',
+            data: <?php echo json_encode($quantidadesVendidas); ?>,
+            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+            borderColor: 'rgba(153, 102, 255, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        scales: {
+            x: {
+                beginAtZero: true
+            },
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+
     </script>
 <?php endif; ?>
 
@@ -360,62 +412,5 @@ function toggleFiltro() {
   }
 }
 
-select {
-    padding: 1%; /* Espaçamento interno */
-    border: 1px solid #ccc; /* Borda */
-    border-radius: 5px; /* Bordas arredondadas */
-    width: 10rem;
-    margin-bottom: 2rem;
-    background-color: #fff; /* Cor de fundo */
-    font-size: 1rem; /* Tamanho da fonte */
-    color: #333; /* Cor do texto */
-    cursor: pointer; /* Muda o cursor ao passar sobre o select */
-    transition: border-color 0.3s; /* Transição suave na cor da borda */
-}
 
-
-select option {
-    padding: 10px; 
-}
-
-.search-container{
-    margin-top: 3rem;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    gap: 2%;
-    
-
-    input[type="text"]{
-        width: 40rem;
-        padding: 2%;
-    }
-}
-
-.tabelaVendas{
-    th {
-    width: 10rem;
-}
-border: none;
-
-    table-layout: fixed;
-    button{
-            background-color: #dd5684; /* Cor rosa */
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 2%;
-        }
-
-        button:hover {
-    background-color: #c3446f; /* Cor rosa escura */
-}
-}
-
-#modalDetalhes{
-    padding-top: 10rem;  
-  
-}
 </style>

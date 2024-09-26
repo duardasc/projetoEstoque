@@ -43,6 +43,10 @@ $resultCompras = $stmtCompras->fetchAll(PDO::FETCH_ASSOC);
 
 <?php if ($mostrarCompras): ?>
     <div class="hdois"><h3>Relatório de Compras</h3></div>
+  
+    <div class="chart-compras">
+        
+    <div class="hdois"><h4>Quantidade de Compras e Preço Total por Mês</h4></div>
     <div class="select-container">
         <form method="GET" action="">
             <input type="hidden" name="mostrar" value="compras">
@@ -57,8 +61,6 @@ $resultCompras = $stmtCompras->fetchAll(PDO::FETCH_ASSOC);
             </select>
         </form>
     </div>
-    <div class="chart-container">
-        <div class="hdois"><h4>Quantidade de Compras e Preço Total por Mês</h4></div>
         <canvas id="comprasPrecoChart"></canvas>
     </div>
     <div class="search-container">
@@ -68,10 +70,9 @@ $resultCompras = $stmtCompras->fetchAll(PDO::FETCH_ASSOC);
             <input type="submit" value="Buscar">
         </form>
     </div>
-    <table border="1">
+    <table >
         <thead>
             <tr>
-                <th>ID da Compra</th>
                 <th>Data da Compra</th>
                 <th>Produto</th>
                 <th>Código</th>
@@ -85,7 +86,6 @@ $resultCompras = $stmtCompras->fetchAll(PDO::FETCH_ASSOC);
         <tbody>
             <?php foreach ($resultCompras as $row): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($row['compra_id']); ?></td>
                     <td><?php echo htmlspecialchars($row['data_compra']); ?></td>
                     <td><?php echo htmlspecialchars($row['nome_produto']); ?></td>
                     <td><?php echo htmlspecialchars($row['codigo']); ?></td>
@@ -227,6 +227,21 @@ $resultCompras = $stmtCompras->fetchAll(PDO::FETCH_ASSOC);
 <?php endif; ?>
 
 <style>
+    .chart-compras{
+        height: 20rem;
+        flex-direction: column;
+        display: flex;
+    align-items: center;
+    padding: 5%;
+    background: #fbfbfb;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgb(0 0 0 / 13%);
+    width: 70%;
+    margin: 0 auto;
+    justify-content: center;
+    margin-top: 3rem;
+    }
+
     
 </style>
 
